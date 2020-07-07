@@ -1,0 +1,61 @@
+---
+title: "smallassign"
+author: "Alex"
+date: '2018-12-19'
+output: html_document
+---
+
+```{r Setup}
+knitr::opts_chunk$set(root.dir = '~/Users/alexandremacphail/desktop')
+setwd("/Users/alexandremacphail/Desktop")
+
+#Import libraries
+library(stringr)
+library(date)
+library(lubridate)
+library(dplyr)
+```
+
+```{r}
+GRNP<-read.csv("Big_Grids_2018_WILDTRAX_REPORT.csv")
+
+GRNPabonly<-GRNP %>%
+  filter(abundance=='TMTC') %>%
+  filter(grepl('AC',species_comment)) %>%
+  filter(!grepl('COWW|RWBL|AMCO|UNBL|MAGO',species_code))
+GRNPabonly$AEkey0<-str_remove(substr(sub('.*:','',GRNPabonly$species_comment),0,2),'\\-|\\+')
+
+GRNPexp<-GRNPabonly[rep(seq.int(1,nrow(GRNPabonly)), GRNPabonly$AEkey0), 1:ncol(GRNPabonly)]  #Create duplicate rows based on AEkey0 value
+GRNPexp$ind_index<-ave(paste(paste(GRNPexp$data_set,GRNPexp$site,GRNPexp$station,as.character(GRNPexp$recording_date),as.character(GRNPexp$recording_time)), GRNPexp$species_code, GRNPexp$species_individual_name, sep=""), paste(paste(GRNPexp$data_set,GRNPexp$site,GRNPexp$station,as.character(GRNPexp$recording_date),as.character(GRNPexp$recording_time)), GRNPexp$species_code, GRNPexp$species_individual_name, sep=""), FUN=seq_along) #Create sequential ID for the duplicated rows
+GRNPexp<-GRNPexp %>%
+  select(-c(species_individual_name,AEkey0))
+
+colnames(GRNPexp)[45]<-"species_individual_name"
+GRNPexp<-GRNPexp[,c(1,2,3,4,5,6,7,8,9,10,11,45,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44)]
+GRNPall<-rbind(GRNP,GRNPexp)
+GRNPall<-GRNPall %>%
+  distinct() %>%
+  arrange(data_set,site,station,recording_date,recording_time,species_code,species_individual_name)
+
+write.csv(GRNPall, 'GRNPfinal2019_Expanded_abundance.csv')
+
+```
+
+```{r}
+
+
+
+GRNPabexp<-GRNPabonly[rep(seq.int(nrow(GRNPabonly)), GRNPabonly$AEkey0), 1:ncol(GRNPabonly)] #Create duplicate rows based on AEkey0 value
+GRNPabexp$ind_index<-ave(paste(GRNPabexp$FileName, GRNPabexp$AOU_CODE,GRNPabexp$INDIV_ID, sep=""), paste(GRNPabexp$FileName,GRNPabexp$AOU_CODE, GRNPabexp$INDIV_ID, sep=""),FUN=seq_along) #Create sequential ID for the duplicated rows
+GRNPabexp<-GRNPabexp[,c(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,42,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41)] #Re-organize the dataframe, this is extraneous but helped me see things better
+GRNPabexp<-GRNPabexp %>% #Drop the old INDIV_ID column
+  select(-c(21))
+colnames(GRNPabexp)[21]<-"INDIV_ID" #Replace it with the sequential IDs
+
+GRNPabexp[which(GRNPabexp$INDIV_ID>1), c(23:26)] <- NA #NA everything after X0min
+GRNPabexp<-GRNPabexp[!(GRNPabexp$INDIV_ID==1),] #Delete the INDIV_ID column 
+GRNPabexp$INDIV_ID<-as.numeric(GRNPabexp$INDIV_ID)
+
+#Merge duplicated dataframe back to the original 
+GRNPall<-rbind(GRNPexp, GRNP)
+```
