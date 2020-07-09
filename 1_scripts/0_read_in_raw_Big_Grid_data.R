@@ -66,6 +66,7 @@ bg.all$VISIT<-paste0(bg.all$Year,"_",
                      bg.all$StationKey,"_",
                      bg.all$recording_date,"_",
                      bg.all$recording_time,"_",
+                     bg.all$method,"_",
                      bg.all$transcriber,"_",
                      bg.all$rain,"_",
                      bg.all$wind,"_",
@@ -78,7 +79,9 @@ bg.all$VISIT<-paste0(bg.all$Year,"_",
 #For N-mixture models we would limit observations to singing
 #rather than calling observations. We'd note if a given individual
 #bird vocalized by singing rather than calling in one of the 
-#(first) three minutes of the recording.
+#(first) three minutes of the recording. If we also include the 3 minute+
+#7-minute transcribed recordings, this filtering will remove any individual
+#birds detected only after the first 3 minutes.
 bg.all$sang<-ifelse(bg.all$min0_voc=="Song",1,
                     ifelse(bg.all$min1_voc=="Song",1,
                            ifelse(bg.all$min2_voc=="Song",1,0)))

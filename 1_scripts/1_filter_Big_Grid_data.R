@@ -23,8 +23,9 @@ levels(as.factor(bg.all$method))
 #more individuals and species being detected. If the 1-minute and 10-minute survey protocols are filtered
 #out then nearly all stations and visits will still have a 3-minute recording.
 
+#bg.3min<-bg.all[bg.all$method=="3m 1SPM",]
 #However, nearly all stations on Big Grids 2,3,and 4 only had a 3+7 minute recording transcribed.
-bg.3min<-bg.all[bg.all$method=="3m 1SPM",]
+
 #Alternatively, keep the 3+7 minute recordings as well
 bg.3min<-bg.all[!bg.all$method=="1m 1SPM",]
 bg.3min<-bg.3min[!bg.3min$method=="10m 1SPM",]
