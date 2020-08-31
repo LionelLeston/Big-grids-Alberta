@@ -24,12 +24,16 @@ str(bg.all)
 #listed as numbers, and a given number value can correspond to same
 #station number in different grids
 bg.all<-bg.all%>%separate(location, c("Project","Gridnum","StationNum"),sep="-")
+bg.all$SS<-paste0(bg.all$Project,"_",bg.all$Gridnum,"_",bg.all$StationNum)
+#bg.all$SS is the same format as the station identifiers in Peter's vegetation data, so
+#it will be used to link bird data to vegetation and human footprint
+
 bg.all$GridnumZ<-ifelse(as.numeric(bg.all$Gridnum)<10, paste0("000",bg.all$Gridnum), paste0("00",bg.all$Gridnum))
 bg.all$StationnumZ<-ifelse(as.numeric(bg.all$StationNum)<10, paste0("00",bg.all$StationNum), 
                            ifelse(as.numeric(bg.all$StationNum)<100, paste0("0",bg.all$StationNum), bg.all$StationNum))
-
 bg.all$Site<-paste0(bg.all$Project,"-",bg.all$GridnumZ)
 bg.all$StationKey<-paste0(bg.all$Project,"-",bg.all$GridnumZ,"-",bg.all$StationnumZ)
+#an alternate station name format that is sometimes used
 
 bg.all$DateTime<-paste0(bg.all$recording_date," ",bg.all$recording_time)
 #bg.all$DateTime<-str_sub(bg.all$DateTime, 1, str_length(bg.all$DateTime)-3)
@@ -63,7 +67,9 @@ levels(bg.all$transcriber)[levels(bg.all$transcriber)=="demkoad@gmail.com"] <- "
 levels(bg.all$transcriber)#data check
 
 bg.all$VISIT<-paste0(bg.all$Year,"_",
-                     bg.all$StationKey,"_",
+                     bg.all$Project,"_",#SS recreated from VISIT later
+                     bg.all$Gridnum,"_",#SS recreated from VISIT later
+                     bg.all$StationNum,"_",#SS recreated from VISIT later
                      bg.all$recording_date,"_",
                      bg.all$recording_time,"_",
                      bg.all$method,"_",
