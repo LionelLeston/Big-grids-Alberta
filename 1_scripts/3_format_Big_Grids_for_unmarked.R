@@ -31,7 +31,7 @@ bird.data.GLMs$Time<-bird.data.GLMs$Hour+(bird.data.GLMs$Minute/60)
 bird.data.GLMs$Time.s<-scale(bird.data.GLMs$Time)
 bird.data.GLMs$Time2.s<-scale(bird.data.GLMs$Time^2)
 
-names = c("Julian.s","Julian2.s","Time.s","Time2.s")
+names = c("Julian","Julian.s","Julian2.s","Time","Time.s","Time2.s")
 
 for(i in names){ 
   bird.data.GLMs$spp<-bird.data.GLMs[,c(i)]  #Species as variable
