@@ -15,6 +15,14 @@ bg.2019<-read.csv("0_data/raw/Big_Grids_2019_WILDTRAX_REPORT.csv",header=TRUE)
 bg.all<-bind_rows(bg.2014, bg.2015, bg.2016, bg.2017, bg.2018, bg.2019)
 str(bg.all)
 
+#Alternatively to reading in the individual Big Grid files from different
+#years, I could read in "APPENDED_WILDTRAX_REPORT", a combined file that is
+#created by Wildtrax at the same time as all files of a particular source
+#and format are downloaded.
+
+bg.all<-read.csv("0_data/raw/APPENDED_WILDTRAX_REPORT.csv", header=TRUE)
+
+
 #location can be used to get the grid number and station 
 #number. For most grids except number 1, numbers increase from west to east
 #and from south to north, so station number 1 will be in southwest corner and
@@ -95,7 +103,8 @@ bg.all$sang<-ifelse(bg.all$min0_voc=="Song",1,
 #Seems to work. Alternatively:
 #bg.all$sang <- apply(bg.all[,c("min0_voc","min1_voc","min2_voc")] == "Song",1,any)
 
-write.csv(bg.all, file="0_data/processed/1_Big_Grids_AllAsOfJune30_2020.csv")
+write.csv(bg.all, file="0_data/processed/1_Big_Grids_AllAsOfSep14_2020.csv")
+#formerly saved as "1_Big_Grids_AllAsOfJune30_2020.csv"
 
 #There are date, time, weater, observer,
 #and method descriptor variables in the raw data that will affect the number of

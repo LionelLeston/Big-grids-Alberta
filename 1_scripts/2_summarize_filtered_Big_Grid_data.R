@@ -2,10 +2,12 @@ library(tidyr)
 library(lubridate)
 library(stringr)
 
-bg.3min.song.birds<-read.csv("0_data/processed/4_Big_Grids_BirdSongOnly_3min_AsOfJune30_2020.csv", header=TRUE)
-nrow(bg.3min.song.birds)#41895
+bg.3min.song.birds<-read.csv("0_data/processed/4_Big_Grids_BirdSongOnly_3min_AsOfSep14_2020.csv", header=TRUE)
+nrow(bg.3min.song.birds)#65518 as of Sep 14; 41895 in July
 str(bg.3min.song.birds)#60 var
 
+bg.3min.song.birds$source_file_name<-str_replace_all(bg.3min.song.birds$source_file_name, fixed("_"), "-")
+#change underscores to hyphens so that source_file_name can be included in VISIT
 
 #for some reason, tapply converts the StationKey portion of visit name to 
 #a number when StationKey is the first part of visit name
@@ -22,10 +24,14 @@ bg.3min.song.birds$VISIT<-paste0(bg.3min.song.birds$Year,"_",
                                  bg.3min.song.birds$industry_noise,"_",
                                  bg.3min.song.birds$noise,"_",
                                  bg.3min.song.birds$latitude,"_",
-                                 bg.3min.song.birds$longitude)
+                                 bg.3min.song.birds$longitude,"_",
+                                 bg.3min.song.birds$source_file_name)
+
+#count birds using just the singing observations
+bg.3min.song.birds$birdabund.songonly[is.na(bg.3min.song.birds$birdabund.songonly)]<-0
 
 bg.3min.song.birds$VISIT.f<-as.factor(as.character(bg.3min.song.birds$VISIT))
-tapply.spp<-tapply(bg.3min.song.birds$birdabund, list(bg.3min.song.birds$VISIT.f, bg.3min.song.birds$species_code), sum, na.rm=TRUE)
+tapply.spp<-tapply(bg.3min.song.birds$birdabund.songonly, list(bg.3min.song.birds$VISIT.f, bg.3min.song.birds$species_code), sum, na.rm=TRUE)
 tapply.spp<-data.frame(tapply.spp)
 tapply.spp$VISIT<-row.names(tapply.spp)
 write.csv(tapply.spp, file = "0_data/processed/5_singingbird_3min_abundpervisit.csv")  
@@ -43,7 +49,8 @@ tapply.spp.wide<-tapply.spp%>%separate(VISIT, c("Year","Project",
                                                 "industry_noise",
                                                 "noise",
                                                 "latitude",
-                                                "longitude"),sep="_")
+                                                "longitude",
+                                                "source_file_name"),sep="_")
 
 
 
@@ -64,6 +71,10 @@ tapply.spp.wide$Minute<-minute(tapply.spp.wide$lubridated)
 tapply.spp.wide$Second<-second(tapply.spp.wide$lubridated)
 write.csv(tapply.spp.wide, file="0_data/processed/6_birdspervisit_visitparsed.csv")
 
+#filter out recordings from night-time (outside of 5-10 AM)
+#remove recordings before May 19 and after July 11
+
+tapply.spp.wide<-read.csv("0_data/processed/6_birdspervisit_visitparsed_filtereddatetime.csv", header=TRUE)
 #cross-tabulate to get the number of visits per station and number of stations
 #transcribed per site
 mytable.visitsXstation<-table(tapply.spp.wide[,c("SS")]) 
@@ -72,7 +83,7 @@ mytable1$SS<-mytable1$Var1
 mytable1$Visits<-mytable1$Freq
 mytable1$Var1<-NULL
 mytable1$Freq<-NULL
-write.csv(mytable1, file="0_data/processed/7_numberofvisitsperstationkey.csv")
+write.csv(mytable1, file="0_data/processed/7_numberofvisitsperstationkey_asofSep14_2020.csv")
 
 tapply.spp.u<-unique(tapply.spp.wide[,c("Site","SS")])
 mytable.stationXsite<-table(tapply.spp.u[,c("Site")])  
@@ -81,9 +92,9 @@ mytable2$Site<-mytable2$Var1
 mytable2$Stations<-mytable2$Freq
 mytable2$Var1<-NULL
 mytable2$Freq<-NULL
-write.csv(mytable2, file="0_data/processed/8_numberofstationspersite.csv")
+write.csv(mytable2, file="0_data/processed/8_numberofstationspersite_asofSep14_2020.csv")
 
-#If just the strictly-3-minute recordings are used
+#If just the strictly-3-minute recordings from June 30 are used
 #The following numbers of stations have transcribed recordings on each grid
 #BG-0001 BG-0002 BG-0003 BG-0004 BG-0005 BG-0006 BG-0007 BG-0008 BG-0009 
 #90       1       2       3     100      97      96      99      97 
@@ -95,7 +106,8 @@ write.csv(mytable2, file="0_data/processed/8_numberofstationspersite.csv")
 #Big Grids 2, 3, and 4 seem suspiciously undone while most other grids are
 #doing just dandy
 
-#If either the strictly-3-minute recordings or 3-minute + 7-minute recordings are used
+#If either the strictly-3-minute recordings or 3-minute + 7-minute 
+#recordings from June 30 are used
 #The following numbers of stations have transcribed recordings on each grid
 #BG-0001 BG-0002 BG-0003 BG-0004 BG-0005 BG-0006 BG-0007 BG-0008 BG-0009 
 #96      98      83     100     100      97      96      99      97 
@@ -103,6 +115,30 @@ write.csv(mytable2, file="0_data/processed/8_numberofstationspersite.csv")
 #95      97     100      98     100      98      92      93      96 
 #BG-0019 
 #32 
+
+# Site Stations
+# 1  BG-0001       96
+# 2  BG-0002       98
+# 3  BG-0003       83
+# 4  BG-0004      100
+# 5  BG-0005      100
+# 6  BG-0006       97
+# 7  BG-0007       96
+# 8  BG-0008       99
+# 9  BG-0009       97
+# 10 BG-0010       95
+# 11 BG-0011       97
+# 12 BG-0012      100
+# 13 BG-0013       98
+# 14 BG-0014      100
+# 15 BG-0015       98
+# 16 BG-0016       92
+# 17 BG-0017       93
+# 18 BG-0018       96
+# 19 BG-0019       32
+
+#Number of stations with 3-minute recordings per site hasn't changed
+#between June 30 and Sep 14
 
 #Back to the bird data: rearrange data frame and replace NA counts with
 #zeroes
