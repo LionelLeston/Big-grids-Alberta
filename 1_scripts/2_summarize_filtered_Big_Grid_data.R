@@ -51,6 +51,52 @@ for (i in species){
   #tapply.rearr$spp[is.na(tapply.rearr$spp)]<-0
   tapply.rearr[,i]<-ifelse(is.na(tapply.rearr[,i]),0,tapply.rearr[,i])
 }
+
+#Get rid of any non-bird observations except NONE
+#This should be done AFTER data have been summarized for visits,
+#just in case one of species we're removing is the only observation 
+#for that visit; otherwise whole visit will be deleted (never summarized)
+levels(bg.3min.song.birds$species_code)
+levels(bg.3min.song.birds$species_english_name)
+
+tapply.rearr$BADG<-NULL #Badger
+tapply.rearr$BCFR<-NULL #Boreal Chorus Frog
+tapply.rearr$BEAV<-NULL #Beaver
+tapply.rearr$CRCH<-NULL #Unknown Crunch Sound
+tapply.rearr$COWW<-NULL #Cow
+tapply.rearr$COYT<-NULL #Coyote
+tapply.rearr$DOGG<-NULL #Dog
+tapply.rearr$HEAI<-NULL #Heavy aircraft noise 
+tapply.rearr$HEBA<-NULL #Heavy background noise
+tapply.rearr$HEDT<-NULL #Heavy deterrents
+tapply.rearr$HENO<-NULL #Heavy continuous industrial noise
+tapply.rearr$HERA<-NULL #Heavy rain
+tapply.rearr$HETN<-NULL #Heavy train
+tapply.rearr$HETR<-NULL #Heavy traffic
+tapply.rearr$HEWI<-NULL #Heavy wind
+tapply.rearr$LIAI<-NULL #Light aircraft noise 
+tapply.rearr$LIBA<-NULL #Light background noise
+tapply.rearr$LIDT<-NULL #Light deterrents
+tapply.rearr$LINO<-NULL #Light continuous industrial noise
+tapply.rearr$LIRA<-NULL #Light rain
+tapply.rearr$LITN<-NULL #Light train
+tapply.rearr$LITR<-NULL #Light traffic
+tapply.rearr$LIWI<-NULL #Light wind
+tapply.rearr$MOAI<-NULL #Moderate aircraft noise 
+tapply.rearr$MOBA<-NULL #Moderate background noise
+tapply.rearr$MODT<-NULL #Moderate deterrents
+tapply.rearr$MONO<-NULL #Moderate continuous industrial noise
+tapply.rearr$MORA<-NULL #Moderate rain
+tapply.rearr$MOTN<-NULL #Moderate train
+tapply.rearr$MOTR<-NULL #Moderate traffic
+tapply.rearr$MOWI<-NULL #Moderate wind
+tapply.rearr$RESQ<-NULL #Red squirrel
+tapply.rearr$UNFR<-NULL #Unknown frog
+tapply.rearr$UNMA<-NULL #Unknown mammal
+tapply.rearr$WETO<-NULL #Western toad
+tapply.rearr$WTDE<-NULL #White-tailed deer
+tapply.rearr$WOLF<-NULL #Wolf
+tapply.rearr$WOFR<-NULL #Wood frog
 write.csv(tapply.rearr, file = "0_data/processed/5_singingbird_3min_abundpervisit_asofOct5.csv")  
 
 
