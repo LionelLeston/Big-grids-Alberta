@@ -30,6 +30,12 @@ bg.3min.song.birds$VISIT<-paste0(bg.3min.song.birds$Year,"_",
 
 #count birds using just the singing observations
 bg.3min.song.birds$birdabund.songonly[is.na(bg.3min.song.birds$birdabund.songonly)]<-0
+bg.3min.song.birds$birdabund.songonly[bg.3min.song.birds$species_code=="NONE"]<-1
+#reassign birdabund.songonly to =1 if species_code="NONE" so we can easily filter 
+#those point count visits. Reassigning birdabund.songonly==NA for species_code==NONE 
+#is important but it could also be assigned a value of 0. But if it's left as
+#NA, then whole visits will be excluded from the data summary!
+
 
 bg.3min.song.birds$VISIT.f<-as.factor(as.character(bg.3min.song.birds$VISIT))
 tapply.spp<-tapply(bg.3min.song.birds$birdabund.songonly, list(bg.3min.song.birds$VISIT.f, bg.3min.song.birds$species_code), sum, na.rm=TRUE)
@@ -45,10 +51,10 @@ for (i in species){
   #tapply.rearr$spp[is.na(tapply.rearr$spp)]<-0
   tapply.rearr[,i]<-ifelse(is.na(tapply.rearr[,i]),0,tapply.rearr[,i])
 }
-write.csv(tapply.rearr, file = "0_data/processed/5_singingbird_3min_abundpervisit.csv")  
+write.csv(tapply.rearr, file = "0_data/processed/5_singingbird_3min_abundpervisit_asofOct5.csv")  
 
 
-tapply.spp<-read.csv("0_data/processed/5_singingbird_3min_abundpervisit.csv",header=TRUE)
+tapply.spp<-read.csv("0_data/processed/5_singingbird_3min_abundpervisit_asofOct5.csv",header=TRUE)
 tapply.spp.wide<-tapply.spp%>%separate(VISIT, c("Year","Project",
                                                 "Gridnum","StationNum",
                                                 "recording_date",
@@ -80,13 +86,13 @@ tapply.spp.wide$Day<-day(tapply.spp.wide$lubridated)
 tapply.spp.wide$Hour<-hour(tapply.spp.wide$lubridated)
 tapply.spp.wide$Minute<-minute(tapply.spp.wide$lubridated)
 tapply.spp.wide$Second<-second(tapply.spp.wide$lubridated)
-write.csv(tapply.spp.wide, file="0_data/processed/6_birdspervisit_visitparsed.csv")
+write.csv(tapply.spp.wide, file="0_data/processed/6_birdspervisit_visitparsed_asofOct5.csv")
 
 #filter out recordings from night-time (outside of 5-10 AM)
 #remove recordings before May 19 and after July 11
 #for now this is being done manually.
 
-tapply.spp.wide<-read.csv("0_data/processed/7_birdspervisit_visitparsed_filtereddatetime.csv", header=TRUE)
+tapply.spp.wide<-read.csv("0_data/processed/7_birdspervisit_visitparsed_filtereddatetime_asofOct5.csv", header=TRUE)
 #cross-tabulate to get the number of visits per station and number of stations
 #transcribed per site
 mytable.visitsXstation<-table(tapply.spp.wide[,c("SS")]) 
@@ -104,6 +110,7 @@ mytable2$Site<-mytable2$Var1
 mytable2$Stations<-mytable2$Freq
 mytable2$Var1<-NULL
 mytable2$Freq<-NULL
-write.csv(mytable2, file="0_data/processed/8b_numberofstationspersite_asofSep14_2020.csv")
-#As of October 5, 2020, 141 stations have <2 visits within the dates and times specified
+write.csv(mytable2, file="0_data/processed/8b_numberofstationspersite_asofOct5_2020.csv")
+#As of October 5, 2020, 9 stations have <2 visits within the dates and times specified
+#As of October 5, 2020, 80 stations have <3 visits within the dates and times specified
 
