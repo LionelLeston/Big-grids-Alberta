@@ -5,7 +5,7 @@ grid.assign<-read.csv("0_data/processed/10_stationgridassignment.csv", header=TR
 str(grid.assign)
 
 #bird data
-birds.GLMs<-read.csv("0_data/processed/6b_birdspervisit_readyforGLMs.csv", header=TRUE)
+birds.GLMs<-read.csv("0_data/processed/7_birdspervisit_visitparsed_filtereddatetime_asofOct5.csv", header=TRUE)
 str(birds.GLMs)#1500 obs
 
 birds.GLMs.summ<-birds.GLMs%>%
