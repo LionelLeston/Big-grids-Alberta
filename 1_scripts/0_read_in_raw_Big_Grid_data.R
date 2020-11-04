@@ -103,7 +103,7 @@ bg.all$sang<-ifelse(bg.all$min0_voc=="Song",1,
 #Seems to work. Alternatively:
 #bg.all$sang <- apply(bg.all[,c("min0_voc","min1_voc","min2_voc")] == "Song",1,any)
 
-write.csv(bg.all, file="0_data/processed/1_Big_Grids_AllAsOfSep14_2020.csv")
+write.csv(bg.all, file="0_data/processed/1_Big_Grids_AllAsOfNov5_2020.csv")
 #formerly saved as "1_Big_Grids_AllAsOfJune30_2020.csv"
 
 #There are date, time, weater, observer,

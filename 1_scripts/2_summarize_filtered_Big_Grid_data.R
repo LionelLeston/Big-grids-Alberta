@@ -3,9 +3,9 @@ library(dplyr)
 library(lubridate)
 library(stringr)
 
-bg.3min.song.birds<-read.csv("0_data/processed/4_Big_Grids_BirdsOnly_3min_AsOfOct5_2020.csv", header=TRUE)
-nrow(bg.3min.song.birds)
-str(bg.3min.song.birds)
+bg.3min.song.birds<-read.csv("0_data/processed/4_Big_Grids_BirdsOnly_3min_AsOfNov5_2020.csv", header=TRUE)
+nrow(bg.3min.song.birds)#78860
+str(bg.3min.song.birds)#66 variables
 
 bg.3min.song.birds$source_file_name<-str_replace_all(bg.3min.song.birds$source_file_name, fixed("_"), "-")
 #change underscores to hyphens so that source_file_name can be included in VISIT
@@ -56,8 +56,8 @@ for (i in species){
 #This should be done AFTER data have been summarized for visits,
 #just in case one of species we're removing is the only observation 
 #for that visit; otherwise whole visit will be deleted (never summarized)
-levels(bg.3min.song.birds$species_code)
-levels(bg.3min.song.birds$species_english_name)
+levels(as.factor(bg.3min.song.birds$species_code))
+levels(as.factor(bg.3min.song.birds$species_english_name))
 
 tapply.rearr$BADG<-NULL #Badger
 tapply.rearr$BCFR<-NULL #Boreal Chorus Frog
@@ -97,10 +97,10 @@ tapply.rearr$WETO<-NULL #Western toad
 tapply.rearr$WTDE<-NULL #White-tailed deer
 tapply.rearr$WOLF<-NULL #Wolf
 tapply.rearr$WOFR<-NULL #Wood frog
-write.csv(tapply.rearr, file = "0_data/processed/5_singingbird_3min_abundpervisit_asofOct5.csv")  
+write.csv(tapply.rearr, file = "0_data/processed/5_singingbird_3min_abundpervisit_asofNov5.csv")  
 
 
-tapply.spp<-read.csv("0_data/processed/5_singingbird_3min_abundpervisit_asofOct5.csv",header=TRUE)
+tapply.spp<-read.csv("0_data/processed/5_singingbird_3min_abundpervisit_asofNov5.csv",header=TRUE)
 tapply.spp.wide<-tapply.spp%>%separate(VISIT, c("Year","Project",
                                                 "Gridnum","StationNum",
                                                 "recording_date",
@@ -132,13 +132,13 @@ tapply.spp.wide$Day<-day(tapply.spp.wide$lubridated)
 tapply.spp.wide$Hour<-hour(tapply.spp.wide$lubridated)
 tapply.spp.wide$Minute<-minute(tapply.spp.wide$lubridated)
 tapply.spp.wide$Second<-second(tapply.spp.wide$lubridated)
-write.csv(tapply.spp.wide, file="0_data/processed/6_birdspervisit_visitparsed_asofOct5.csv")
+write.csv(tapply.spp.wide, file="0_data/processed/6_birdspervisit_visitparsed_asofNov5.csv")
 
-#filter out recordings from night-time (outside of 5-10 AM)
+#filter out recordings from night-time (outside of 4-10 AM)
 #remove recordings before May 19 and after July 11
 #for now this is being done manually.
 
-tapply.spp.wide<-read.csv("0_data/processed/7_birdspervisit_visitparsed_filtereddatetime_asofOct5.csv", header=TRUE)
+tapply.spp.wide<-read.csv("0_data/processed/7_birdspervisit_visitparsed_filtereddatetime_asofNov5.csv", header=TRUE)
 #cross-tabulate to get the number of visits per station and number of stations
 #transcribed per site
 mytable.visitsXstation<-table(tapply.spp.wide[,c("SS")]) 
@@ -147,7 +147,7 @@ mytable1$SS<-mytable1$Var1
 mytable1$Visits<-mytable1$Freq
 mytable1$Var1<-NULL
 mytable1$Freq<-NULL
-write.csv(mytable1, file="0_data/processed/8a_numberofvisitsperstationkey_asofOct5_2020.csv")
+write.csv(mytable1, file="0_data/processed/8a_numberofvisitsperstationkey_asofNov5_2020.csv")
 
 tapply.spp.u<-unique(tapply.spp.wide[,c("Site","SS")])
 mytable.stationXsite<-table(tapply.spp.u[,c("Site")])  
@@ -156,7 +156,7 @@ mytable2$Site<-mytable2$Var1
 mytable2$Stations<-mytable2$Freq
 mytable2$Var1<-NULL
 mytable2$Freq<-NULL
-write.csv(mytable2, file="0_data/processed/8b_numberofstationspersite_asofOct5_2020.csv")
-#As of October 5, 2020, 9 stations have <2 visits within the dates and times specified
-#As of October 5, 2020, 80 stations have <3 visits within the dates and times specified
+write.csv(mytable2, file="0_data/processed/8b_numberofstationspersite_asofNov5_2020.csv")
+#As of November 5, 2020, 7 stations have <2 visits within the dates and times specified
+#As of November 5, 2020, 60 stations have <3 visits within the dates and times specified
 
